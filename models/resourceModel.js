@@ -21,6 +21,10 @@ const resourceSchema = new mongoose.Schema(
         filePath: {
             type: String,
             required: true,
+        },
+        fileFront: {
+            type: String,
+            required: true,
         }
     }
 );

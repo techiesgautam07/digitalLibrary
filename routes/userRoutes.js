@@ -7,8 +7,8 @@ const { authorize } = require('../middlewares/auth');
 
 
 router.post('/api/signup', signup)
-router.post('/api/signin', signin),
-    router.post('/api/request', authorize, sendResourceRequest)
+router.post('/api/signin', signin)
+router.post('/api/request', authorize, sendResourceRequest)
 
 
 router.get('/', (req, res) => {

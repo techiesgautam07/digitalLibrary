@@ -35,7 +35,7 @@ const signin = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ error: "Invalid Credentials" });
         }
-        const token = createToken(user.email);
+        const token = createToken(user.email, user.role);
         res.cookie('token', token, { httpOnly: true });
         res.json({ message: "Signin Successfull", user, token });
     } catch (error) {

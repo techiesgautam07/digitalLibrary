@@ -13,17 +13,16 @@ const resourceUpload = async (req, res) => {
             author,
             publisher
         } = req.body;
-        if (!req.file) {
+        if (!req.files) {
             return res.status(400).json({ error: "Please upload a file" });
         }
-        const file = req.file.originalname;
-
         const resource = await resources.create({
             name,
             description,
             author,
             publisher,
-            file
+            filePath: req.files.resourceFile[0].originalname,
+            fileFront: req.files.resourceFrontImage[0].originalname
         });
         res.status(201).json({ message: "Resource uploaded successfully", resource });
     } catch (error) {
