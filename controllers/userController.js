@@ -1,5 +1,5 @@
 const { users } = require('../models/userModel');
-const { requests } = require('../models/resourceModel');
+const { requests, resources } = require("../models/resourceModel")
 const { createToken } = require('../utils/utilities');
 const bcrypt = require('bcrypt');
 
@@ -70,9 +70,81 @@ const sendResourceRequest = async (req, res) => {
     }
 }
 
+const getResources = async (req, res) => {
+    try {
+        const { email } = req.user
+        const result = await resources.find();
+        const user = await users.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User Not Found" });
+        }
+        const final = result.map(key => {
+            return {
+                id: key._id,
+                name: key.name,
+                description: key.description,
+                author: key.author,
+                publisher: key.publisher,
+                filePath: user.allowedResources.includes(key._id) ? key.filePath : undefined,
+                fileFront: key.fileFront
+            }
+        })
+        res.json({ result: final });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const getOneResource = async (req, res) => {
+    try {
+        const { email } = req.user
+        const { id } = req.params
+        const user = await users.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User Not Found" });
+        }
+        const resource = await resources.findById(id)
+        const result = {
+            id: resource._id,
+            name: resource.name,
+            description: resource.description,
+            author: resource.author,
+            publisher: resource.publisher,
+            filePath: user.allowedResources.includes(resource._id) ? resource.filePath : undefined,
+            fileFront: resource.fileFront
+        }
+
+        res.status(200).json({ result })
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+const getAllowedResources = async (req, res) => {
+    try {
+        const { email } = req.user
+        const user = await users.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User Not Found" });
+        }
+
+
+
+        const allowedResources = await resources.find({ _id: { $in: user.allowedResources } });
+
+
+        res.status(200).json({ result: allowedResources });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
 
 
 
 
 
-module.exports = { signup, signin, sendResourceRequest }
+
+module.exports = { signup, signin, sendResourceRequest, getResources, getOneResource, getAllowedResources }
