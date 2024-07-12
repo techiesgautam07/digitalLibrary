@@ -10,7 +10,7 @@ const { singleImageValidator } = require('../middlewares/validator');
 
 router.post('/api/signup', upload.single("image"), singleImageValidator, signup)
 router.post('/api/signin', signin)
-router.post('/api/request', authorize, sendResourceRequest)
+router.get('/api/request/:resourceId', authorize, sendResourceRequest)
 router.get('/api/resources', authorize, getResources)
 router.get('/api/resources/:id', authorize, getOneResource)
 router.get('/api/allowedresources', authorize, getAllowedResources)

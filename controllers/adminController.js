@@ -62,9 +62,11 @@ const adminApprove = async (req, res) => {
         }
         const request = await requests.findById(reqId);
 
-        await users.updateOne(request.userId, {
-            allowedResources: [...request.allowedResources, request.resourceId]
-        })
+        const user = await users.findById(request.userId)
+        if (!user) {
+            return res.status(404).json({ error: "User Not Found" });
+        }
+        const update = user.allowedResources.push(request.resourceId)
         await request.updateOne({
             status: 'approved'
         })
@@ -72,7 +74,8 @@ const adminApprove = async (req, res) => {
             return res.status(404).json({ error: "Request Not Found" });
         }
         request.save()
-        res.json({ message: "Request Approved Successfully", result: request });
+        user.save()
+        res.json({ message: "Request Approved Successfully", result: update });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -84,8 +87,8 @@ const getAllRequest = async (req, res) => {
         if (req.user.role !== "admin") {
             return res.status(403).json({ error: "Unauthorized Access" });
         }
-        const requests = await requests.find({});
-        res.json({ requests });
+        const request = await requests.find({});
+        res.json({ request });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });

@@ -47,8 +47,9 @@ const signin = async (req, res) => {
 
 const sendResourceRequest = async (req, res) => {
     try {
-        const { userId, resourceId } = req.body
-        const user = await users.findById(userId);
+        const { resourceId } = req.params
+        const { email } = req.user
+        const user = await users.findOne({ email });
         if (!user) {
             return res.status(404).json({ error: "User Not Found" });
         }
@@ -57,14 +58,15 @@ const sendResourceRequest = async (req, res) => {
             return res.status(409).json({ error: "You already have access to this resource" });
         }
 
-        if (await requests.find({ resourceId, userId })) {
+        if (await requests.findOne({ resourceId, userId: user.id })) {
             return res.status(409).json({ error: "User Already Requested Resource" });
         }
 
         await requests.create({
             resourceId,
-            userId
+            userId: user.id
         })
+        res.status(200).json({ message: "Request Sent Successfully" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
