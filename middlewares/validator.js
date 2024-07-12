@@ -1,4 +1,4 @@
-const { uploader } = require('../utils/utilities')
+const { uploader, singleUploader } = require('../utils/utilities')
 
 
 const imageValidator = async (req, res, next) => {
@@ -28,4 +28,27 @@ const imageValidator = async (req, res, next) => {
     uploader(req, res, next);
 }
 
-module.exports = { imageValidator };
+const singleImageValidator = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return next()
+        }
+
+        const { mimetype, size } = req.file;
+        const types = process.env.ALLOWED_IMG_TYPES;
+
+        if (!types.includes(mimetype)) {
+            return res.status(400).json({ error: res.__('school.invImgType') });
+        }
+        if (size > process.env.ALLOWED_IMG_SIZE) {
+            return res.status(400).json({ error: res.__('school.invImgSize') });
+        }
+        singleUploader(req, res, next);
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+module.exports = { imageValidator, singleImageValidator };

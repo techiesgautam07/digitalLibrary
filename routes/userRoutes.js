@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { signin, signup, sendResourceRequest, getResources, getOneResource, getAllowedResources } = require('../controllers/userController');
 const { authorize } = require('../middlewares/auth');
+const { upload } = require('../utils/utilities')
+const { singleImageValidator } = require('../middlewares/validator');
 
 
 
 
-router.post('/api/signup', signup)
+router.post('/api/signup', upload.single("image"), singleImageValidator, signup)
 router.post('/api/signin', signin)
 router.post('/api/request', authorize, sendResourceRequest)
 router.get('/api/resources', authorize, getResources)

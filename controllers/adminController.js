@@ -1,6 +1,7 @@
 const { resources, requests } = require('../models/resourceModel')
 const { users } = require('../models/userModel');
 const { createToken } = require('../utils/utilities');
+const bcrypt = require('bcrypt');
 
 const resourceUpload = async (req, res) => {
     try {
@@ -34,21 +35,22 @@ const signup = async (req, res) => {
 
     try {
         const { name, email, password, contact } = req.body;
+        const { originalname } = req.file
         const existUser = await users.findOne({ where: { email } });
         if (existUser) {
             return res.status(409).json({ error: "User Already Registered" });
         }
         const hashPassword = await bcrypt.hash(password, 10);
 
-        const user = await users.create({ name, email, password: hashPassword, role: 'admin', contact });
+        const user = await users.create({ name, email, password: hashPassword, role: 'admin', contact, profilePic: originalname });
 
         const token = createToken(user.email);
 
         res.cookie('token', token, { httpOnly: true });
         res.json({ message: "Signup Successfull", user, token });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+        console.error(error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
 

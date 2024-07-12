@@ -20,13 +20,13 @@ const uploader = async (req, res, next) => {
     const files = req.files;
 
     if (!files) {
-        return next();
+        return res.status(400).json({ error: 'No file uploaded.' });
     }
 
     try {
         for (const key in files) {
             const file = files[key][0];
-            const uniqueFilename = randString(4) + file.originalname;
+            const uniqueFilename = (randString(4) + file.originalname).trim();
             const filepath = path.join(__dirname, '../uploads', uniqueFilename);
 
             await fs.writeFile(filepath, file.buffer);
@@ -40,10 +40,26 @@ const uploader = async (req, res, next) => {
     }
 }
 
+const singleUploader = async (req, res, next) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded.' });
+    }
+    const uniqueFilename = (randString(4) + req.file.originalname).trim();
+    const filepath = path.join(__dirname, '../uploads', uniqueFilename);
+
+    try {
+        await fs.writeFile(filepath, req.file.buffer);
+        req.file.originalname = uniqueFilename;
+        next();
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: res.__("serverErr") });
+    }
+}
+
 const uploadFields = upload.fields([
     { name: 'resourceFile', maxCount: 1 },
     { name: 'resourceFrontImage', maxCount: 1 }
 ]);
 
-
-module.exports = { createToken, uploadFields, uploader }
+module.exports = { createToken, uploadFields, uploader, singleUploader, upload }

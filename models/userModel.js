@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
             type: [mongoose.Schema.Types.ObjectId],
             ref: "resources",
             default: []
+        },
+        profilePic: {
+            type: String,
+            default: "default.jpg"
         }
     }
 );
