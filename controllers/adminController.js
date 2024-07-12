@@ -1,5 +1,6 @@
 const { resources, requests } = require('../models/resourceModel')
 const { users } = require('../models/userModel');
+const { contacts } = require('../models/contactModels');
 const { createToken } = require('../utils/utilities');
 const bcrypt = require('bcrypt');
 
@@ -132,4 +133,41 @@ const getAllUser = async (req, res) => {
     }
 }
 
-module.exports = { resourceUpload, signup, adminApprove, getAllRequest, getOneRequest, getOneUser, getAllUser }
+
+
+const getContactForms = async (req, res) => {
+    try {
+        const { role } = req.user
+
+        if (role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized Access" });
+        }
+        const contactForms = await contacts.find({});
+        res.json({ contactForms });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+        console.error(error.message)
+    }
+}
+
+const getOneContactForm = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { role } = req.user
+
+        if (role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized Access" });
+        }
+        const contactForm = await contacts.findById(id);
+        if (!contactForm) {
+            return res.status(404).json({ error: "Contact Form Not Found" });
+        }
+        res.json({ contactForm });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+        console.error(error.message)
+    }
+}
+
+
+module.exports = { resourceUpload, signup, adminApprove, getAllRequest, getOneRequest, getOneUser, getAllUser, getOneContactForm, getContactForms }

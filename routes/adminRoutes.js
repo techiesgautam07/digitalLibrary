@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { imageValidator, singleImageValidator } = require('../middlewares/validator');
 const { uploadFields, upload } = require('../utils/utilities');
-const { resourceUpload, signup, adminApprove, getAllRequest, getOneRequest, getAllUser, getOneUser } = require('../controllers/adminController');
+const { resourceUpload, signup, adminApprove, getAllRequest, getOneRequest,
+    getAllUser, getOneUser, getOneContactForm, getContactForms } = require('../controllers/adminController');
 const { authorize } = require('../middlewares/auth');
 
 
@@ -13,6 +14,9 @@ router.get('/api/admin/requests/:reqId', authorize, getOneRequest)
 router.get('/api/admin/requests', authorize, getAllRequest)
 router.get('/api/admin/users', authorize, getAllUser)
 router.get('/api/admin/users/:id', authorize, getOneUser);
+router.get('/api/admin/contact', authorize, getContactForms)
+router.get('/api/admin/contact/:id', authorize, getOneContactForm)
+
 
 
 module.exports = router;

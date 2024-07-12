@@ -143,9 +143,19 @@ const getAllowedResources = async (req, res) => {
     }
 }
 
+const contactForm = async (req, res) => {
+    try {
+        const { name, email, contact, message } = req.body;
+        const contactForm = await contacts.create({ name, email, message, contact });
+        res.json({ message: "Message sent successfully", contactForm });
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+        console.error(error.message)
+    }
+}
 
 
 
 
 
-module.exports = { signup, signin, sendResourceRequest, getResources, getOneResource, getAllowedResources }
+module.exports = { signup, signin, sendResourceRequest, getResources, getOneResource, getAllowedResources, contactForm }
